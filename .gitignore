@@ -1,0 +1,6 @@
+.DS_Store
+.svn/
+versions/
+log/*
+tmp/**/*
+rdoc/
