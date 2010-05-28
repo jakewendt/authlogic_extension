@@ -15,4 +15,29 @@ class AuthlogicExtensionTest < ActiveSupport::TestCase
 
 	end
 
+#	test "a" do
+#		create_user
+#		puts "a:#{User.count}"
+#	end
+#
+#	test "b" do
+#		create_user
+#		puts "b:#{User.count}"
+#	end
+#
+#	test "c" do
+#		create_user
+#		puts "c:#{User.count}"
+#	end
+#
+#	test "d" do
+#		create_user
+#		puts "d: #{User.count}"
+#	end
+#
+#	test "e" do
+#		create_user
+#		puts "e:#{User.count}"
+#	end
+
 end
