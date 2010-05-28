@@ -1,3 +1,81 @@
+require 'test/unit'
 require 'rubygems'
-require 'active_support'
+require 'active_record'
+#require 'active_record/fixtures'
+require 'action_controller'
+require 'action_controller/test_case'
 require 'active_support/test_case'
+require 'authlogic'
+require 'authlogic/test_case'
+require File.dirname(__FILE__) + '/../init'
+
+#	Don't output ALL of the database migrations 
+#	for EVERY test
+ActiveRecord::Schema.verbose = false
+
+#	Don't know what this is
+#ActiveRecord::Base.configurations = true
+
+ActiveRecord::Base.establish_connection(
+	:adapter => "sqlite3", 
+	:database => ":memory:")
+
+def setup_db
+	ActiveRecord::Schema.define(:version => 1) do
+		create_table :users do |t|
+			t.string :login
+			t.string :email
+			t.string :crypted_password
+			t.string :password_salt
+			t.string :persistence_token
+			t.string :perishable_token
+	    t.timestamps
+		end
+		add_index :users, :login, :unique => true
+		add_index :users, :email, :unique => true
+	end
+end
+
+def reset_db
+	ActiveRecord::Base.connection.tables.each do |table|
+		ActiveRecord::Base.connection.drop_table(table)
+	end
+	setup_db
+end
+
+setup_db
+
+class User < ActiveRecord::Base
+	#	Some Authlogic BS requires that the db exists
+	#	before running acts_as_authentic or it will
+	#	just silently do nothing!
+	acts_as_authentic 	#do |c|
+#		c.maintain_sessions = false
+#	end
+end
+
+class UserSession < Authlogic::Session::Base
+end
+
+class ActiveSupport::TestCase
+	#	It would be nice to setup transactions
+	#	but this doesn't work
+#	include ActiveRecord::TestFixtures
+#	self.use_transactional_fixtures = true
+#	self.use_instantiated_fixtures  = false
+
+	@@count = 0
+	setup    :activate_authlogic
+	setup    :reset_db
+
+	def create_user(options={})
+		@@count += 1
+		User.create!({
+			:login    => "login#{@@count}",
+			:email    => "login#{@@count}@example.com",
+			:password => 'test',
+			:password_confirmation => 'test'
+		}.merge(options))
+	end
+
+end
